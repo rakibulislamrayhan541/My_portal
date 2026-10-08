@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Collectorate School and College, Rangpur - Management Portal</title>
+  <!-- CSS ফাইল লিংক -->
+  <link rel="stylesheet" href="portal.css">
+</head>
+<body>
+
+  <!-- HEADER WITH LOGO -->
+  <header>
+    <div class="header-logo-container">
+      <img src="https://share.google/BX9wnlz7Y5eyaHtLo" alt="Collectorate School and College Rangpur Logo" class="school-logo">
+      <div>
+        <h1>Collectorate School and College, Rangpur</h1>
+        <p>কানেক্টিং ফিউচার উইথ এডুকেশন | ডিজিটাল ম্যানেজমেন্ট পোর্টাল</p>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+
+    <!-- AUTHENTICATION CONTAINER (SIGN IN / SIGN UP) -->
+    <div id="auth-section" class="card auth-container">
+      <div class="tab-buttons">
+        <button class="tab-btn active" onclick="switchAuthTab('signin')">Sign In</button>
+        <button class="tab-btn" onclick="switchAuthTab('signup')">Sign Up</button>
+      </div>
+
+      <!-- SIGN IN FORM -->
+      <form id="signin-form" onsubmit="event.preventDefault(); handleSignIn();">
+        <div class="form-group">
+          <label>আমি একজন (Role)</label>
+          <select id="signin-role">
+            <option value="student">Student (শিক্ষার্থী)</option>
+            <option value="teacher">Teacher (শিক্ষক)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>রোল নম্বর / আইডি</label>
+          <input type="text" id="signin-id" placeholder="যেমন: 101 অথবা 1001" required>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="signin-pass" placeholder="আপনার পাসওয়ার্ড লিখুন" required>
+        </div>
+        <button type="submit" class="btn">Sign In</button>
+        <div id="signin-msg" class="alert alert-danger"></div>
+      </form>
+
+      <!-- SIGN UP FORM -->
+      <form id="signup-form" class="hidden" onsubmit="event.preventDefault(); handleSignUp();">
+        <div class="form-group">
+          <label>একাউন্টের ধরন (Account Type)</label>
+          <select id="signup-role" onchange="toggleSignUpClass(this.value)">
+            <option value="student">Student (শিক্ষার্থী)</option>
+            <option value="teacher">Teacher (শিক্ষক)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>পূর্ণ নাম (Full Name)</label>
+          <input type="text" id="signup-name" placeholder="আপনার নাম লিখুন" required>
+        </div>
+        
+        <!-- Class Selection for Student -->
+        <div class="form-group" id="signup-class-group">
+          <label>শ্রেণি (Class)</label>
+          <select id="signup-class">
+            <option value="Class 6">Class 6 (৬ষ্ঠ শ্রেণি)</option>
+            <option value="Class 7">Class 7 (৭ম শ্রেণি)</option>
+            <option value="Class 8">Class 8 (৮ম শ্রেণি)</option>
+            <option value="Class 9">Class 9 (৯ম শ্রেণি)</option>
+            <option value="Class 10">Class 10 (১০ম শ্রেণি)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label id="signup-id-label">রোল নম্বর / টিচার আইডি</label>
+          <input type="text" id="signup-id" placeholder="যেমন: 102 অথবা 1002" required>
+        </div>
+        <div class="form-group">
+          <label>পাসওয়ার্ড সেট করুন (Set Password)</label>
+          <input type="password" id="signup-pass" placeholder="নতুন পাসওয়ার্ড লিখুন" required>
+        </div>
+        <button type="submit" class="btn">Sign Up & Register</button>
+        <div id="signup-msg" class="alert"></div>
+      </form>
+    </div>
+
+    <!-- STUDENT DASHBOARD -->
+    <div id="student-dashboard" class="card hidden">
+      <div class="profile-banner">
+        <div class="profile-info">
+          <h3 id="student-display-name">Student Name</h3>
+          <p>শ্রেণি: <b id="student-display-class">Class 6</b> | রোল: <b id="student-display-roll">---</b></p>
+        </div>
+        <button class="btn btn-logout" onclick="logout()">Logout</button>
+      </div>
+
+      <!-- Result Table -->
+      <h3 class="section-title">একাডেমিক রেজাল্ট (Academic Results)</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>কোর্সের/বিষয়ের নাম</th>
+            <th>প্রাপ্ত নম্বর</th>
+            <th>গ্রেড (Grade)</th>
+            <th>পয়েন্ট (GPA Point)</th>
+          </tr>
+        </thead>
+        <tbody id="student-result-table"></tbody>
+      </table>
+
+      <!-- Total Result Calculation Summary -->
+      <div id="result-summary" class="summary-card hidden">
+        <div class="summary-box">
+          <h4>মোট বিষয়</h4>
+          <p id="total-subjects">0</p>
+        </div>
+        <div class="summary-box">
+          <h4>মোট প্রাপ্ত নম্বর</h4>
+          <p id="total-marks">0</p>
+        </div>
+        <div class="summary-box">
+          <h4>গড় নম্বর (Average)</h4>
+          <p id="avg-marks">0.00</p>
+        </div>
+        <div class="summary-box">
+          <h4>মোট জিপিএ (GPA)</h4>
+          <p id="final-gpa">0.00</p>
+        </div>
+      </div>
+
+      <!-- Attendance Table -->
+      <h3 class="section-title">ক্লাস উপস্থিতি (Attendance Status)</h3>
+      <p style="margin-top: 8px;">মোট অনুষ্ঠিত ক্লাস: <b>100</b> | উপস্থিতি: <b id="student-attendance-count">0</b> টি</p>
+
+      <!-- Monthly Fee Table -->
+      <h3 class="section-title">মাসিক বেতনের হিসাব (Tuition Fees)</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>মাস</th>
+            <th>পরিমাণ</th>
+            <th>অবস্থা (Status)</th>
+          </tr>
+        </thead>
+        <tbody id="student-fee-table"></tbody>
+      </table>
+
+      <!-- Password Update -->
+      <div class="password-box">
+        <h4 style="margin-bottom: 10px; color: #0d47a1;">পাসওয়ার্ড পরিবর্তন করুন</h4>
+        <div style="display: flex; gap: 10px;">
+          <input type="password" id="student-new-pass" placeholder="নতুন পাসওয়ার্ড লিখুন" style="padding: 10px; flex: 1; border: 1px solid #ccc; border-radius: 5px;">
+          <button class="btn" style="width: auto;" onclick="updatePassword('student')">Update</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TEACHER DASHBOARD -->
+    <div id="teacher-dashboard" class="card hidden">
+      <div class="profile-banner">
+        <div class="profile-info">
+          <h3 id="teacher-display-name">Teacher Name</h3>
+          <p>আইডি: <b id="teacher-display-id">---</b> | পদবী: শিক্ষক (Faculty Member)</p>
+        </div>
+        <button class="btn btn-logout" onclick="logout()">Logout</button>
+      </div>
+
+      <!-- Assign Marks / Multi-Subject Entry -->
+      <h3 class="section-title">কোর্স/বিষয় ও মার্কস আপডেট (ইচ্ছামতো নতুন বিষয় যোগ করুন)</h3>
+      <p style="font-size: 13px; color: #666; margin-bottom: 12px;">নির্দিষ্ট ক্লাসের স্টুডেন্ট রোল দিয়ে ইচ্ছেমতো যতখুশি বিষয় ও প্রাপ্ত নম্বর এন্ট্রি করতে পারবেন।</p>
+      
+      <div class="action-grid">
+        <select id="assign-class">
+          <option value="Class 6">Class 6</option>
+          <option value="Class 7">Class 7</option>
+          <option value="Class 8">Class 8</option>
+          <option value="Class 9">Class 9</option>
+          <option value="Class 10">Class 10</option>
+        </select>
+        <input type="text" id="assign-roll" placeholder="স্টুডেন্ট রোল (e.g. 101)">
+        <input type="text" id="assign-course" placeholder="বিষয়ের নাম (e.g. Physics, ICT)">
+        <input type="number" id="assign-marks" placeholder="প্রাপ্ত মার্কস">
+        <button class="btn" style="width: auto;" onclick="assignCourseAndMarks()">Submit Marks</button>
+      </div>
+
+      <!-- Update Attendance -->
+      <h3 class="section-title">শিক্ষার্থীর উপস্থিতি আপডেট করুন</h3>
+      <div class="action-grid">
+        <input type="text" id="att-roll" placeholder="স্টুডেন্ট রোল">
+        <input type="number" id="att-count" placeholder="মোট উপস্থিতি (out of 100)">
+        <button class="btn" style="width: auto;" onclick="updateStudentAttendance()">Update Attendance</button>
+      </div>
+
+      <!-- Registered Students Summary -->
+      <h3 class="section-title">রেজিস্টার্ড স্টুডেন্টদের তালিকা</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>রোল</th>
+            <th>নাম</th>
+            <th>শ্রেণি</th>
+            <th>মোট এন্ট্রি হওয়া বিষয়</th>
+          </tr>
+        </thead>
+        <tbody id="teacher-student-list"></tbody>
+      </table>
+
+      <!-- Salary Records -->
+      <h3 class="section-title">ব্যাংক স্যালারি ও পেমেন্ট রেকর্ড (Bank Salary Records)</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>মাস</th>
+            <th>বেতনের পরিমাণ</th>
+            <th>ব্যাংক পেমেন্ট স্ট্যাটাস</th>
+          </tr>
+        </thead>
+        <tbody id="teacher-salary-table"></tbody>
+      </table>
+
+      <!-- Password Update -->
+      <div class="password-box">
+        <h4 style="margin-bottom: 10px; color: #0d47a1;">পাসওয়ার্ড পরিবর্তন করুন</h4>
+        <div style="display: flex; gap: 10px;">
+          <input type="password" id="teacher-new-pass" placeholder="নতুন পাসওয়ার্ড লিখুন" style="padding: 10px; flex: 1; border: 1px solid #ccc; border-radius: 5px;">
+          <button class="btn" style="width: auto;" onclick="updatePassword('teacher')">Update</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- JavaScript ফাইল লিংক -->
+  <script src="portal.js"></script>
+</body>
+</html>
